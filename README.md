@@ -1,7 +1,7 @@
 ﻿AnimeFaceWinForm
 ====================
 
-AnimeFaceWinForm : A frontend for AnimeFace (http://anime.udp.jp/imager-animeface.html).
+AnimeFaceWinForm : A frontend software for AnimeFace (http://anime.udp.jp/imager-animeface.html).
 
 Introduction
 --------------------
