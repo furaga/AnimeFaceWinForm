@@ -1,12 +1,14 @@
 ﻿AnimeFaceWinForm
 ====================
 
-AnimeFaceWinForm : A frontend software for AnimeFace (http://anime.udp.jp/imager-animeface.html).
+**AnimeFaceWinForm** : A frontend software for AnimeFace [AnimeFace](http://anime.udp.jp/imager-animeface.html).
 
 Introduction
 --------------------
 
-**AnimeFaceWinForm** is a frontend software for AnimeFace (http://anime.udp.jp/imager-animeface.html).
+A user select a video file (.mp4, .mov, .avi, .vob, ...), then the software searches anime character's faces in the video.
+
+The face recognition is internally processed by [AnimeFace](http://anime.udp.jp/imager-animeface.html).
 
 ![Imgur](http://i.imgur.com/N8IzUC9.png)
 
@@ -16,10 +18,9 @@ Implementation and Requirements
 --------------------
 
 The frontend processes an input video with OpenCVSharp, 
-and conduct face recognition with CPython.
-The face recognition script is ./AnimeFaceWinForm/bin/python/detect.py.
+and conducts face recognition with a python script, ./AnimeFaceWinForm/bin/python/detect.py.
 
-So, you need to install Python 2.7.
+You need to install Python 2.7.
 
 This software is implemented as a WinForm application with Visual C# 2013.
 I confirmed this software works on ThinkPad X1 Carbon in Windows 10.
