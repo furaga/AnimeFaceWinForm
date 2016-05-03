@@ -310,5 +310,10 @@ namespace AnimeFaceWinForm
                 System.Diagnostics.Process.Start(path);
             }
         }
+
+        private void label2_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
