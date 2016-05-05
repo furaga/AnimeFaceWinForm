@@ -51,6 +51,11 @@ namespace AnimeFaceWinForm
                 skipFrames.Enabled = false;
                 startButton.Enabled = false;
                 cancelButton.Enabled = true;
+
+                fpsTextBox.Enabled = false;
+                screenshotOnlyCheckBox.Enabled = false;
+                startScreenshotButton.Enabled = false;
+                stopScreenshotButton.Enabled = true;
             }
             else
             {
@@ -60,17 +65,29 @@ namespace AnimeFaceWinForm
                 skipFrames.Enabled = true;
                 startButton.Enabled = true;
                 cancelButton.Enabled = false;
+
+                fpsTextBox.Enabled = true;
+                startScreenshotButton.Enabled = true;
+                screenshotOnlyCheckBox.Enabled = true;
+                stopScreenshotButton.Enabled = false;
             }
 
+            // Tagプロパティに正常なフォルダパス名が入っていればEnableにする
+            outputFolderButton.Enabled = isValidOutputFolderButton(outputFolderButton);
+            screenshotOutputFolder.Enabled = isValidOutputFolderButton(screenshotOutputFolder);
+        }
+
+        /// <summary>
+        /// Tagプロパティにフォルダパス名が入っているか
+        /// </summary>
+        bool isValidOutputFolderButton(Button outputFolderButton)
+        {
             string ouputDirPath = outputFolderButton.Tag as string;
             if (ouputDirPath != null && System.IO.Directory.Exists(ouputDirPath))
             {
-                outputFolderButton.Enabled = true;
+                return true;
             }
-            else
-            {
-                outputFolderButton.Enabled = false;
-            }
+            return false;
         }
 
         private void selectButton_Click(object sender, EventArgs e)
@@ -114,7 +131,7 @@ namespace AnimeFaceWinForm
 
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            BackgroundWorker worker = (BackgroundWorker)sender;
+            BackgroundWorker worker = sender as BackgroundWorker;
 
             var arg = e.Argument as bgWorkArg;
             string filepath = arg.filepath;
@@ -162,7 +179,7 @@ namespace AnimeFaceWinForm
 
                         // python実行
                         bool result;
-                        string output = RunCPython("../python", "detect.py input.png", out result);
+                        string output = AnimeFaceRecognizer.RunCPython("../python", "detect.py input.png", out result);
 
                         if (false == result)
                         {
@@ -171,7 +188,7 @@ namespace AnimeFaceWinForm
                         }
 
                         // 結果をパースして、得られた顔領域で画像をトリミングして保存
-                        var faces = ParseFaces(output);
+                        var faces = AnimeFaceRecognizer.ParseFaces(output);
                         int faceCnt = 0;
                         foreach (var face in faces)
                         {
@@ -243,77 +260,72 @@ namespace AnimeFaceWinForm
             backgroundWorker.CancelAsync();
         }
 
-
-        // Pythonスクリプトの実行
-        string RunCPython(string rootDir, string arguments, out bool result)
-        {
-            try
-            {
-                System.Diagnostics.ProcessStartInfo psInfo = new System.Diagnostics.ProcessStartInfo();
-
-                psInfo.FileName = "python.exe"; // 実行するファイル
-                psInfo.Arguments = arguments;
-                psInfo.CreateNoWindow = true; // コンソール・ウィンドウを開かない
-                psInfo.UseShellExecute = false; // シェル機能を使用しない
-                psInfo.RedirectStandardOutput = true; // 標準出力をリダイレクト
-                psInfo.WorkingDirectory = System.IO.Path.GetFullPath(rootDir);
-                System.Diagnostics.Process p = System.Diagnostics.Process.Start(psInfo); // アプリの実行開始
-                string output = p.StandardOutput.ReadToEnd(); // 標準出力の読み取り
-
-                result = true;
-                return output;
-            }
-            catch (Exception ex)
-            {
-                System.Windows.Forms.MessageBox.Show(ex.ToString() + "\n" + ex.StackTrace);
-                result = false;
-                return "";
-            }
-        }
-
-        // pythonからの出力をパースして、顔領域を抽出
-        List<RectangleF> ParseFaces(string output)
-        {
-            var faces = new List<RectangleF>();
-
-            foreach (var _line in output.Split('\n'))
-            {
-                var line = _line.Trim().Trim('(', ')').Trim();
-                var tkns = line.Split(',')
-                    .Where(tkn => false == string.IsNullOrWhiteSpace(tkn))
-                    .Select(tkn => tkn.Trim())
-                    .ToArray();
-
-                if (tkns.Length != 4)
-                {
-                    continue;
-                }
-
-                float x, y, w, h;
-                if (float.TryParse(tkns[0], out x) &&
-                    float.TryParse(tkns[1], out y) &&
-                    float.TryParse(tkns[2], out w) &&
-                    float.TryParse(tkns[3], out h))
-                {
-                    faces.Add(new RectangleF(x, y, w, h));
-                }
-            }
-
-            return faces;
-        }
-
         private void outputFolderButton_Click(object sender, EventArgs e)
         {
-            string path = outputFolderButton.Tag as string;
-            if (path != null && System.IO.Directory.Exists(path))
+            var button = sender as Button;
+            if (null != button)
             {
-                System.Diagnostics.Process.Start(path);
+                string path = button.Tag as string;
+                if (path != null && System.IO.Directory.Exists(path))
+                {
+                    System.Diagnostics.Process.Start(path);
+                }
             }
         }
 
-        private void label2_Click(object sender, EventArgs e)
+        private void startScreenshotButton_Click(object sender, EventArgs e)
         {
-
+            if (false == screenshotBackgroundWorker.IsBusy)
+            {
+                screenshotBackgroundWorker.RunWorkerAsync();
+                setUIEnabled(true);
+            }
         }
+
+        private void stopScreenshotButton_Click(object sender, EventArgs e)
+        {
+            screenshotBackgroundWorker.CancelAsync();
+        }
+
+        private void screenshotBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+
+            // TODO:
+
+            while (true)
+            {
+                // キャンセルされてないか定期的にチェック
+                if (worker.CancellationPending)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+                System.Threading.Thread.Sleep(100);
+            }
+        }
+
+        private void screenshotBackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            // 撮影枚数・FPSを表示
+
+
+            setUIEnabled(true);
+        }
+
+        private void screenshotBackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
+                MessageBox.Show("Stopped the capturing correctly");
+            }
+            else
+            {
+                MessageBox.Show("The capturing calcelled unexpectedly");
+            }
+
+            setUIEnabled(false);
+        }
+    
     }
 }
