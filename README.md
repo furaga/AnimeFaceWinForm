@@ -6,7 +6,7 @@ AnimeFaceWinForm
 Introduction
 --------------------
 
-A user select a video file (.mp4, .mov, .avi, .vob, ...), then the software searches anime character's faces in the video.
+The software searches anime character's faces in a video file (.mp4, .mov, .avi, .vob, ...).
 
 The face recognition is internally processed by [AnimeFace](http://anime.udp.jp/imager-animeface.html).
 
@@ -14,21 +14,26 @@ The face recognition is internally processed by [AnimeFace](http://anime.udp.jp/
 
 ![Imgur](http://i.imgur.com/VEAz2QD.png)
 
+Also, this software can take screenshots (of the primary screen) at a certain interval, and searches anime faces in the screenshots.
+
 ![Imgur](http://i.imgur.com/dR6i03p.png)
 
 ![Imgur](http://i.imgur.com/zauCFfM.png)
 
+(Captured screenshots with playing http://www.nicovideo.jp/watch/1461737064)
 
 Implementation and Requirements
 --------------------
 
-The frontend processes an input video with OpenCVSharp, 
-and conducts face recognition with a python script, ./AnimeFaceWinForm/bin/python/detect.py.
+The software captures images from an input video using OpenCVSharp, 
+and recognizes faces using a python script, ./AnimeFaceWinForm/bin/python/detect.py.
 
-You need to install Python 2.7.
+You need to install Python (>= 2.7.9) and numpy (>= 1.9.2).
+
+I installed Python 2.7.11 (32 bit) from [the official web page](https://www.python.org/) and install numpy using numpy-1.9.2-win32-superpack-python2.7.exe from [sourceforge](https://sourceforge.net/projects/numpy/files/NumPy/1.9.2/)
 
 This software is implemented as a WinForm application with Visual C# 2013.
-I confirmed this software works on ThinkPad X1 Carbon in Windows 10.
+I confirmed this software works on both Windows 10 in ThinkPad X1 Carbon and Windows 7 in a desktop PC.
 
 
 Licence
