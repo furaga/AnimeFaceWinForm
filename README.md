@@ -1,7 +1,7 @@
 AnimeFaceWinForm
 ====================
 
-**AnimeFaceWinForm** : A frontend software for AnimeFace [AnimeFace](http://anime.udp.jp/imager-animeface.html).
+**AnimeFaceWinForm** : A frontend software for  [AnimeFace](http://anime.udp.jp/imager-animeface.html).
 
 Introduction
 --------------------
@@ -28,9 +28,12 @@ Implementation and Requirements
 The software captures images from an input video using OpenCVSharp, 
 and recognizes faces using a python script, ./AnimeFaceWinForm/bin/python/detect.py.
 
-You need to install Python (>= 2.7.9) and numpy (>= 1.9.2).
+You need to install Python (>= 2.7.9), numpy (>= 1.9.2) and OpenCV.
 
-I installed Python 2.7.11 (32 bit) from [the official web page](https://www.python.org/) and install numpy using numpy-1.9.2-win32-superpack-python2.7.exe from [sourceforge](https://sourceforge.net/projects/numpy/files/NumPy/1.9.2/)
+I installed **Python 2.7.11 (32 bit)** from [the official web page](https://www.python.org/), numpy using **numpy-1.9.2-win32-superpack-python2.7.exe** from [sourceforge](https://sourceforge.net/projects/numpy/files/NumPy/1.9.2/), and installed OpenCV using **opencv-3.1.0.exe** from [sourceforge](https://sourceforge.net/projects/opencvlibrary/files/opencv-win/)
+
+Then, I copied C:\opencv\build\python\2.7\x86\cv2.pyd into 
+C:\Python27\Lib\site-packages, and added C:\Python27\Lib\site-packages to PYTHONPATH.
 
 This software is implemented as a WinForm application with Visual C# 2013.
 I confirmed this software works on both Windows 10 in ThinkPad X1 Carbon and Windows 7 in a desktop PC.

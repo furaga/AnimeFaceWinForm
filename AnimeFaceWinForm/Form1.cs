@@ -395,7 +395,6 @@ namespace AnimeFaceWinForm
                     return;
                 }
 
-                // TODO: screen capture
                 var bmp = takeScreenshot(Screen.PrimaryScreen.Bounds);
                 if (bmp != null)
                 {
