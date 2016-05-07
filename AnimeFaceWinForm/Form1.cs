@@ -348,19 +348,18 @@ namespace AnimeFaceWinForm
             float millisecPerFrame = 1000.0f / args.Fps;
             string saveDir = "../output_screenshot/" + DateTime.Now.ToString("yyyyMMdd_hhmmss");
 
+            string saveScreenshotDir = saveDir + "/screenshot";
+
+            saveDir = System.IO.Path.GetFullPath(saveDir);
+            saveScreenshotDir = System.IO.Path.GetFullPath(saveScreenshotDir);
+
             var userState = new ScreenshotBackgroundWorkUserState()
             {
                 ScreenshotCount = 0,
                 RealFps = args.Fps,
                 SaveDirectoryPath = saveDir,
             };
-
             worker.ReportProgress(0, userState.ScreenshotCount);
-
-            string saveScreenshotDir = saveDir + "/screenshot";
-
-            saveDir = System.IO.Path.GetFullPath(saveDir);
-            saveScreenshotDir = System.IO.Path.GetFullPath(saveScreenshotDir);
 
             if (args.OptionFlags.HasFlag(ScreenshotOptionFlag.SaveScreenshot))
             {
