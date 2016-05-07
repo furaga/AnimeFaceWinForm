@@ -53,8 +53,9 @@ namespace AnimeFaceWinForm
                 cancelButton.Enabled = true;
 
                 fpsTextBox.Enabled = false;
-                screenshotOnlyCheckBox.Enabled = false;
+                screenshotWithoutFaceRecognitionCheckBox.Enabled = false;
                 startScreenshotButton.Enabled = false;
+                saveScreenshotCheckBox.Enabled = false;
                 stopScreenshotButton.Enabled = true;
             }
             else
@@ -68,7 +69,8 @@ namespace AnimeFaceWinForm
 
                 fpsTextBox.Enabled = true;
                 startScreenshotButton.Enabled = true;
-                screenshotOnlyCheckBox.Enabled = true;
+                screenshotWithoutFaceRecognitionCheckBox.Enabled = true;
+                saveScreenshotCheckBox.Enabled = true;
                 stopScreenshotButton.Enabled = false;
             }
 
@@ -125,7 +127,7 @@ namespace AnimeFaceWinForm
 
         string getDirectoryName(string inputVideoFilePath)
         {
-            string dirName = System.IO.Path.GetFullPath("output/" + System.IO.Path.GetFileNameWithoutExtension(inputVideoFilePath));
+            string dirName = System.IO.Path.GetFullPath("../output_file/" + System.IO.Path.GetFileNameWithoutExtension(inputVideoFilePath));
             return dirName;
         }
 
@@ -135,7 +137,7 @@ namespace AnimeFaceWinForm
 
             var arg = e.Argument as bgWorkArg;
             string filepath = arg.filepath;
-            string dirName = getDirectoryName(filepath);
+            string saveDir = getDirectoryName(filepath);
 
             worker.ReportProgress(0);
 
@@ -146,12 +148,12 @@ namespace AnimeFaceWinForm
                     return;
                 }
 
-                if (System.IO.Directory.Exists(dirName) == false)
+                if (System.IO.Directory.Exists(saveDir) == false)
                 {
-                    System.IO.Directory.CreateDirectory(dirName);
+                    System.IO.Directory.CreateDirectory(saveDir);
                 }
 
-                System.Diagnostics.Process.Start(dirName);
+                System.Diagnostics.Process.Start(saveDir);
                 capture.PosFrames = arg.startFrame;
 
                 int prevProgress = -1;
@@ -174,33 +176,8 @@ namespace AnimeFaceWinForm
                             return;
                         }
 
-                        // 画像を一旦保存して、pythonに渡す
-                        cap.SaveImage(System.IO.Path.GetFullPath("../python/input.png"));
-
-                        // python実行
-                        bool result;
-                        string output = AnimeFaceRecognizer.RunCPython("../python", "detect.py input.png", out result);
-
-                        if (false == result)
-                        {
-                            e.Result = false;
-                            return;
-                        }
-
-                        // 結果をパースして、得られた顔領域で画像をトリミングして保存
-                        var faces = AnimeFaceRecognizer.ParseFaces(output);
-                        int faceCnt = 0;
-                        foreach (var face in faces)
-                        {
-                            using (var faceImage = cap.Clone(new OpenCvSharp.CvRect((int)face.X, (int)face.Y, (int)face.Width, (int)face.Height)))
-                            {
-                                if (System.IO.Directory.Exists(dirName) == false)
-                                {
-                                    System.IO.Directory.CreateDirectory(dirName);
-                                }
-                                faceImage.SaveImage(System.IO.Path.Combine(dirName, capture.PosFrames + "-" + (faceCnt++) + ".png"));
-                            }
-                        }
+                        string prefix = capture.PosFrames + "-";
+                        AnimeFaceRecognizer.FaceRecognizeAndSaveResults(cap, saveDir, prefix);
                     }
 
                     // 終了判定
@@ -277,8 +254,20 @@ namespace AnimeFaceWinForm
         {
             if (false == screenshotBackgroundWorker.IsBusy)
             {
-                screenshotBackgroundWorker.RunWorkerAsync();
-                setUIEnabled(true);
+                float fps;
+                
+                if (float.TryParse(fpsTextBox.Text, out fps))
+                {
+                    var args = new ScreenshotBackgroundWorkArguments()
+                    {
+                        Fps = fps,
+                        WithoutFaceRecognition = screenshotWithoutFaceRecognitionCheckBox.Checked,
+                        SaveScreenshotImage = saveScreenshotCheckBox.Checked,
+                    };
+
+                    screenshotBackgroundWorker.RunWorkerAsync(args);
+                    setUIEnabled(true);
+                }
             }
         }
 
@@ -287,28 +276,152 @@ namespace AnimeFaceWinForm
             screenshotBackgroundWorker.CancelAsync();
         }
 
+
+        class ScreenshotBackgroundWorkArguments
+        {
+            public float Fps { get; set; }
+            public bool WithoutFaceRecognition { get; set; }
+            public bool SaveScreenshotImage { get; set; }
+        }
+        
+        class ScreenshotBackgroundWorkUserState
+        {
+            public int ScreenshotCount { get; set; }
+            public float RealFps { get; set; }
+            public string SaveDirectoryPath { get; set; }
+        }
+
+        Bitmap screenshotBmp;
+
+        Bitmap takeScreenshot(Rectangle rect)
+        {
+            var size = new Size(rect.Width, rect.Height);
+            if (screenshotBmp == null)
+            {
+                screenshotBmp = new Bitmap(rect.Width, rect.Height);
+            }
+
+            using (var g = Graphics.FromImage(screenshotBmp))
+            {
+                g.CopyFromScreen(rect.X, rect.Y, 0, 0, size, CopyPixelOperation.SourceCopy);
+            }
+
+            return screenshotBmp;
+        }
+
+        /// <summary>
+        /// スクショ＋顔認識のバックグラウンド処理
+        /// </summary>
         private void screenshotBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
 
-            // TODO:
+            var args = e.Argument as ScreenshotBackgroundWorkArguments;
+            if (args == null || args.Fps < 0.01f)
+            {
+                return;
+            }
 
+            float millisecPerFrame = 1000.0f / args.Fps;
+            string saveDir = "../output_screenshot/" + DateTime.Now.ToString("yyyyMMdd_hhmmss");
+
+            var userState = new ScreenshotBackgroundWorkUserState()
+            {
+                ScreenshotCount = 0,
+                RealFps = args.Fps,
+                SaveDirectoryPath = saveDir,
+            };
+
+            worker.ReportProgress(0, userState.ScreenshotCount);
+
+            string saveScreenshotDir = saveDir + "/screenshot";
+
+            saveDir = System.IO.Path.GetFullPath(saveDir);
+            saveScreenshotDir = System.IO.Path.GetFullPath(saveScreenshotDir);
+
+            if (args.SaveScreenshotImage)
+            {
+                if (System.IO.Directory.Exists(saveScreenshotDir) == false)
+                {
+                    System.IO.Directory.CreateDirectory(saveScreenshotDir);
+                }
+
+                System.IO.File.Copy("../script/screenshot2faces.bat", System.IO.Path.Combine(saveDir, "screenshot2faces.bat"));
+            }
+            else
+            {
+                if (System.IO.Directory.Exists(saveDir) == false)
+                {
+                    System.IO.Directory.CreateDirectory(saveDir);
+                }
+            }
+
+            System.Diagnostics.Process.Start(saveDir);
+
+            List<float> elapsedTimeHistory = new List<float>();
+
+            System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
             while (true)
             {
+                timer.Restart();
+
                 // キャンセルされてないか定期的にチェック
                 if (worker.CancellationPending)
                 {
                     e.Cancel = true;
                     return;
                 }
-                System.Threading.Thread.Sleep(100);
+
+                // TODO: screen capture
+                var bmp = takeScreenshot(Screen.PrimaryScreen.Bounds);
+                if (bmp != null)
+                {
+                    // スクショを保存
+                    if (args.SaveScreenshotImage)
+                    {
+                        string path = System.IO.Path.Combine(saveScreenshotDir, userState.ScreenshotCount + ".png");
+                        bmp.Save(path);
+                    }
+
+                    // 顔認識して、顔部分を切り出して保存
+                    if (false == args.WithoutFaceRecognition)
+                    {
+                        string prefix = userState.ScreenshotCount + "-";
+                        AnimeFaceRecognizer.FaceRecognizeAndSaveResults(bmp, saveDir, prefix);
+                    }
+                }
+
+                // FPS設定に合わせて、一定時間寝る
+                int waitTime = (int)(millisecPerFrame - timer.ElapsedMilliseconds);
+                waitTime = Math.Max(0, waitTime);
+                System.Threading.Thread.Sleep(waitTime);
+
+                // 撮影したスクショの枚数
+                userState.ScreenshotCount++;
+
+                // fpsの計算
+                elapsedTimeHistory.Add(timer.ElapsedMilliseconds);
+                if (elapsedTimeHistory.Sum() >= 1.0f)
+                {
+                    userState.RealFps = 1000.0f / elapsedTimeHistory.Average();
+                    elapsedTimeHistory.Clear();
+                }
+
+                // 進捗報告
+                worker.ReportProgress(0, userState);
             }
         }
 
         private void screenshotBackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             // 撮影枚数・FPSを表示
-
+            var userState = e.UserState as ScreenshotBackgroundWorkUserState;
+            if (userState != null)
+            {
+                capturedScreenshotCountLabel.Text = string.Format("Captured {0} Frames", userState.ScreenshotCount);
+                realFpsLabel.Text = string.Format("{0:.0} FPS", userState.RealFps);
+                screenshotOutputFolder.Tag = userState.SaveDirectoryPath;
+            }
 
             setUIEnabled(true);
         }
@@ -317,11 +430,11 @@ namespace AnimeFaceWinForm
         {
             if (e.Cancelled)
             {
-                MessageBox.Show("Stopped the capturing correctly");
+                MessageBox.Show("Stopped correctly");
             }
             else
             {
-                MessageBox.Show("The capturing calcelled unexpectedly");
+                MessageBox.Show("Calcelled unexpectedly");
             }
 
             setUIEnabled(false);

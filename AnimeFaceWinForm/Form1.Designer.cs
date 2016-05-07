@@ -47,17 +47,18 @@
             this.label8 = new System.Windows.Forms.Label();
             this.pathLabel = new System.Windows.Forms.TextBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
+            this.capturedScreenshotCountLabel = new System.Windows.Forms.Label();
+            this.realFpsLabel = new System.Windows.Forms.Label();
             this.stopScreenshotButton = new System.Windows.Forms.Button();
             this.startScreenshotButton = new System.Windows.Forms.Button();
             this.screenshotOutputFolder = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.screenshotOnlyCheckBox = new System.Windows.Forms.CheckBox();
+            this.screenshotWithoutFaceRecognitionCheckBox = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.fpsTextBox = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.screenshotBackgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.saveScreenshotCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.startFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.skipFrames)).BeginInit();
             this.tabControl1.SuspendLayout();
@@ -262,8 +263,8 @@
             // tabPage2
             // 
             this.tabPage2.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.tabPage2.Controls.Add(this.label1);
-            this.tabPage2.Controls.Add(this.label6);
+            this.tabPage2.Controls.Add(this.capturedScreenshotCountLabel);
+            this.tabPage2.Controls.Add(this.realFpsLabel);
             this.tabPage2.Controls.Add(this.stopScreenshotButton);
             this.tabPage2.Controls.Add(this.startScreenshotButton);
             this.tabPage2.Controls.Add(this.screenshotOutputFolder);
@@ -275,25 +276,25 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "From Screenshot";
             // 
-            // label1
+            // capturedScreenshotCountLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(256, 240);
-            this.label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(189, 21);
-            this.label1.TabIndex = 24;
-            this.label1.Text = "Captured -- Frames";
+            this.capturedScreenshotCountLabel.AutoSize = true;
+            this.capturedScreenshotCountLabel.Location = new System.Drawing.Point(256, 240);
+            this.capturedScreenshotCountLabel.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.capturedScreenshotCountLabel.Name = "capturedScreenshotCountLabel";
+            this.capturedScreenshotCountLabel.Size = new System.Drawing.Size(189, 21);
+            this.capturedScreenshotCountLabel.TabIndex = 24;
+            this.capturedScreenshotCountLabel.Text = "Captured -- Frames";
             // 
-            // label6
+            // realFpsLabel
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(497, 240);
-            this.label6.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(87, 21);
-            this.label6.TabIndex = 17;
-            this.label6.Text = "--- FPS";
+            this.realFpsLabel.AutoSize = true;
+            this.realFpsLabel.Location = new System.Drawing.Point(497, 240);
+            this.realFpsLabel.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.realFpsLabel.Name = "realFpsLabel";
+            this.realFpsLabel.Size = new System.Drawing.Size(87, 21);
+            this.realFpsLabel.TabIndex = 17;
+            this.realFpsLabel.Text = "--- FPS";
             // 
             // stopScreenshotButton
             // 
@@ -333,24 +334,25 @@
             // panel1
             // 
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel1.Controls.Add(this.screenshotOnlyCheckBox);
+            this.panel1.Controls.Add(this.saveScreenshotCheckBox);
+            this.panel1.Controls.Add(this.screenshotWithoutFaceRecognitionCheckBox);
             this.panel1.Controls.Add(this.label5);
             this.panel1.Controls.Add(this.fpsTextBox);
             this.panel1.Controls.Add(this.label7);
             this.panel1.Location = new System.Drawing.Point(12, 17);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(774, 102);
+            this.panel1.Size = new System.Drawing.Size(774, 142);
             this.panel1.TabIndex = 28;
             // 
-            // screenshotOnlyCheckBox
+            // screenshotWithoutFaceRecognitionCheckBox
             // 
-            this.screenshotOnlyCheckBox.AutoSize = true;
-            this.screenshotOnlyCheckBox.Location = new System.Drawing.Point(15, 56);
-            this.screenshotOnlyCheckBox.Name = "screenshotOnlyCheckBox";
-            this.screenshotOnlyCheckBox.Size = new System.Drawing.Size(398, 25);
-            this.screenshotOnlyCheckBox.TabIndex = 27;
-            this.screenshotOnlyCheckBox.Text = "Capturing only (without Face Recognition)";
-            this.screenshotOnlyCheckBox.UseVisualStyleBackColor = true;
+            this.screenshotWithoutFaceRecognitionCheckBox.AutoSize = true;
+            this.screenshotWithoutFaceRecognitionCheckBox.Location = new System.Drawing.Point(15, 56);
+            this.screenshotWithoutFaceRecognitionCheckBox.Name = "screenshotWithoutFaceRecognitionCheckBox";
+            this.screenshotWithoutFaceRecognitionCheckBox.Size = new System.Drawing.Size(398, 25);
+            this.screenshotWithoutFaceRecognitionCheckBox.TabIndex = 27;
+            this.screenshotWithoutFaceRecognitionCheckBox.Text = "Capturing only (without Face Recognition)";
+            this.screenshotWithoutFaceRecognitionCheckBox.UseVisualStyleBackColor = true;
             // 
             // label5
             // 
@@ -385,6 +387,16 @@
             this.screenshotBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.screenshotBackgroundWorker_DoWork);
             this.screenshotBackgroundWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.screenshotBackgroundWorker_ProgressChanged);
             this.screenshotBackgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.screenshotBackgroundWorker_RunWorkerCompleted);
+            // 
+            // saveScreenshotCheckBox
+            // 
+            this.saveScreenshotCheckBox.AutoSize = true;
+            this.saveScreenshotCheckBox.Location = new System.Drawing.Point(15, 87);
+            this.saveScreenshotCheckBox.Name = "saveScreenshotCheckBox";
+            this.saveScreenshotCheckBox.Size = new System.Drawing.Size(179, 25);
+            this.saveScreenshotCheckBox.TabIndex = 28;
+            this.saveScreenshotCheckBox.Text = "Save screenshot";
+            this.saveScreenshotCheckBox.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -434,18 +446,19 @@
         private System.Windows.Forms.TextBox pathLabel;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label capturedScreenshotCountLabel;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label realFpsLabel;
         private System.Windows.Forms.Button startScreenshotButton;
         private System.Windows.Forms.Button stopScreenshotButton;
-        private System.Windows.Forms.CheckBox screenshotOnlyCheckBox;
+        private System.Windows.Forms.CheckBox screenshotWithoutFaceRecognitionCheckBox;
         private System.Windows.Forms.TextBox fpsTextBox;
         private System.Windows.Forms.Button screenshotOutputFolder;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.Panel panel4;
         private System.ComponentModel.BackgroundWorker screenshotBackgroundWorker;
+        private System.Windows.Forms.CheckBox saveScreenshotCheckBox;
     }
 }
 

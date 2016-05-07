@@ -70,5 +70,76 @@ namespace AnimeFaceWinForm
             return faces;
         }
 
+        
+        private static bool FaceRecognizeAndSaveResultsCommon(string saveDir, string filePahtPrefix, List<Tuple<string, RectangleF>> facesInfo)
+        {
+            // python実行
+            bool result;
+            string output = AnimeFaceRecognizer.RunCPython("../python", "detect.py input.png", out result);
+
+            if (false == result)
+            {
+                return false;
+            }
+
+            // 結果をパースして、得られた顔領域で画像をトリミングして保存
+            var faces = AnimeFaceRecognizer.ParseFaces(output);
+
+            int faceCnt = 0;
+            foreach (var face in faces)
+            {
+                string savePath = System.IO.Path.Combine(saveDir, filePahtPrefix + (faceCnt++) + ".png");
+                facesInfo.Add(new Tuple<string,RectangleF>(savePath, face));
+            }
+
+            return true;
+        }
+
+        public static bool FaceRecognizeAndSaveResults(Bitmap input, string saveDir, string filePahtPrefix)
+        {
+            input.Save(System.IO.Path.GetFullPath("../python/input.png"));
+
+            List<Tuple<string, RectangleF>> facesInfo = new List<Tuple<string, RectangleF>>();
+            if (false == FaceRecognizeAndSaveResultsCommon(saveDir, filePahtPrefix, facesInfo))
+            {
+                return false;
+            }
+
+            foreach (var info in facesInfo)
+            {
+                string savePath = info.Item1;
+                RectangleF face = info.Item2;
+                using (var faceImage = input.Clone(face, input.PixelFormat))
+                {
+                    faceImage.Save(savePath);
+                }
+            }
+
+            return true;
+        }
+
+
+        public static bool FaceRecognizeAndSaveResults(OpenCvSharp.IplImage input, string saveDir, string filePahtPrefix)
+        {
+            input.SaveImage(System.IO.Path.GetFullPath("../python/input.png"));
+
+            List<Tuple<string, RectangleF>> facesInfo = new List<Tuple<string, RectangleF>>();
+            if (false == FaceRecognizeAndSaveResultsCommon(saveDir, filePahtPrefix, facesInfo))
+            {
+                return false;
+            }
+
+            foreach (var info in facesInfo)
+            {
+                string savePath = info.Item1;
+                RectangleF face = info.Item2;
+                using (var faceImage = input.Clone(new OpenCvSharp.CvRect((int)face.X, (int)face.Y, (int)face.Width, (int)face.Height)))
+                {
+                    faceImage.SaveImage(savePath);
+                }
+            }
+
+            return true;
+        }
     }
 }
