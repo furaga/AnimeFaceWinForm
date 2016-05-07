@@ -53,12 +53,12 @@
             this.startScreenshotButton = new System.Windows.Forms.Button();
             this.screenshotOutputFolder = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.screenshotWithoutFaceRecognitionCheckBox = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.screenshotOptionComboBox = new System.Windows.Forms.ComboBox();
             this.label5 = new System.Windows.Forms.Label();
             this.fpsTextBox = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.screenshotBackgroundWorker = new System.ComponentModel.BackgroundWorker();
-            this.saveScreenshotCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.startFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.skipFrames)).BeginInit();
             this.tabControl1.SuspendLayout();
@@ -334,8 +334,8 @@
             // panel1
             // 
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel1.Controls.Add(this.saveScreenshotCheckBox);
-            this.panel1.Controls.Add(this.screenshotWithoutFaceRecognitionCheckBox);
+            this.panel1.Controls.Add(this.label1);
+            this.panel1.Controls.Add(this.screenshotOptionComboBox);
             this.panel1.Controls.Add(this.label5);
             this.panel1.Controls.Add(this.fpsTextBox);
             this.panel1.Controls.Add(this.label7);
@@ -344,15 +344,26 @@
             this.panel1.Size = new System.Drawing.Size(774, 142);
             this.panel1.TabIndex = 28;
             // 
-            // screenshotWithoutFaceRecognitionCheckBox
+            // label1
             // 
-            this.screenshotWithoutFaceRecognitionCheckBox.AutoSize = true;
-            this.screenshotWithoutFaceRecognitionCheckBox.Location = new System.Drawing.Point(15, 56);
-            this.screenshotWithoutFaceRecognitionCheckBox.Name = "screenshotWithoutFaceRecognitionCheckBox";
-            this.screenshotWithoutFaceRecognitionCheckBox.Size = new System.Drawing.Size(398, 25);
-            this.screenshotWithoutFaceRecognitionCheckBox.TabIndex = 27;
-            this.screenshotWithoutFaceRecognitionCheckBox.Text = "Capturing only (without Face Recognition)";
-            this.screenshotWithoutFaceRecognitionCheckBox.UseVisualStyleBackColor = true;
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(15, 68);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(120, 21);
+            this.label1.TabIndex = 30;
+            this.label1.Text = "How to work";
+            // 
+            // screenshotOptionComboBox
+            // 
+            this.screenshotOptionComboBox.FormattingEnabled = true;
+            this.screenshotOptionComboBox.Items.AddRange(new object[] {
+            "Face recognition only",
+            "Face recognition + Save screenshots",
+            "Save screenshots only"});
+            this.screenshotOptionComboBox.Location = new System.Drawing.Point(210, 65);
+            this.screenshotOptionComboBox.Name = "screenshotOptionComboBox";
+            this.screenshotOptionComboBox.Size = new System.Drawing.Size(507, 29);
+            this.screenshotOptionComboBox.TabIndex = 29;
             // 
             // label5
             // 
@@ -388,16 +399,6 @@
             this.screenshotBackgroundWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.screenshotBackgroundWorker_ProgressChanged);
             this.screenshotBackgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.screenshotBackgroundWorker_RunWorkerCompleted);
             // 
-            // saveScreenshotCheckBox
-            // 
-            this.saveScreenshotCheckBox.AutoSize = true;
-            this.saveScreenshotCheckBox.Location = new System.Drawing.Point(15, 87);
-            this.saveScreenshotCheckBox.Name = "saveScreenshotCheckBox";
-            this.saveScreenshotCheckBox.Size = new System.Drawing.Size(179, 25);
-            this.saveScreenshotCheckBox.TabIndex = 28;
-            this.saveScreenshotCheckBox.Text = "Save screenshot";
-            this.saveScreenshotCheckBox.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 21F);
@@ -409,6 +410,7 @@
             this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "Form1";
             this.Text = "AnimeFace WinForm Frontend";
+            this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.startFrame)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.skipFrames)).EndInit();
             this.tabControl1.ResumeLayout(false);
@@ -451,14 +453,14 @@
         private System.Windows.Forms.Label realFpsLabel;
         private System.Windows.Forms.Button startScreenshotButton;
         private System.Windows.Forms.Button stopScreenshotButton;
-        private System.Windows.Forms.CheckBox screenshotWithoutFaceRecognitionCheckBox;
         private System.Windows.Forms.TextBox fpsTextBox;
         private System.Windows.Forms.Button screenshotOutputFolder;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel5;
         private System.Windows.Forms.Panel panel4;
         private System.ComponentModel.BackgroundWorker screenshotBackgroundWorker;
-        private System.Windows.Forms.CheckBox saveScreenshotCheckBox;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox screenshotOptionComboBox;
     }
 }
 

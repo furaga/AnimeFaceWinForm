@@ -1,4 +1,4 @@
-﻿AnimeFaceWinForm
+AnimeFaceWinForm
 ====================
 
 **AnimeFaceWinForm** : A frontend software for AnimeFace [AnimeFace](http://anime.udp.jp/imager-animeface.html).
@@ -10,9 +10,14 @@ A user select a video file (.mp4, .mov, .avi, .vob, ...), then the software sear
 
 The face recognition is internally processed by [AnimeFace](http://anime.udp.jp/imager-animeface.html).
 
-![Imgur](http://i.imgur.com/N8IzUC9.png)
+![Imgur](http://i.imgur.com/IQhdHRL.png)
 
 ![Imgur](http://i.imgur.com/VEAz2QD.png)
+
+![Imgur](http://i.imgur.com/dR6i03p.png)
+
+![Imgur](http://i.imgur.com/zauCFfM.png)
+
 
 Implementation and Requirements
 --------------------

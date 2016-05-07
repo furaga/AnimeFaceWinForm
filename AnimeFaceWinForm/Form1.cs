@@ -17,6 +17,11 @@ namespace AnimeFaceWinForm
             InitializeComponent();
         }
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            screenshotOptionComboBox.SelectedIndex = 0;
+        }
+
         class bgWorkArg
         {
             public string filepath;
@@ -53,9 +58,8 @@ namespace AnimeFaceWinForm
                 cancelButton.Enabled = true;
 
                 fpsTextBox.Enabled = false;
-                screenshotWithoutFaceRecognitionCheckBox.Enabled = false;
+                screenshotOptionComboBox.Enabled = false;
                 startScreenshotButton.Enabled = false;
-                saveScreenshotCheckBox.Enabled = false;
                 stopScreenshotButton.Enabled = true;
             }
             else
@@ -69,8 +73,7 @@ namespace AnimeFaceWinForm
 
                 fpsTextBox.Enabled = true;
                 startScreenshotButton.Enabled = true;
-                screenshotWithoutFaceRecognitionCheckBox.Enabled = true;
-                saveScreenshotCheckBox.Enabled = true;
+                screenshotOptionComboBox.Enabled = true;
                 stopScreenshotButton.Enabled = false;
             }
 
@@ -250,6 +253,28 @@ namespace AnimeFaceWinForm
             }
         }
 
+        enum ScreenshotOptionFlag
+        {
+            None = 0,
+            FaceRecognition = 1,
+            SaveScreenshot = 2,
+            All = 3,
+        }
+
+        ScreenshotOptionFlag getScreenshotOptionFlags()
+        {
+            ScreenshotOptionFlag option = ScreenshotOptionFlag.None;
+            if (screenshotOptionComboBox.Text.Contains("Face recognition"))
+            {
+                option |= ScreenshotOptionFlag.FaceRecognition;
+            }
+            if (screenshotOptionComboBox.Text.Contains("Save screenshots"))
+            {
+                option |= ScreenshotOptionFlag.SaveScreenshot;
+            }
+            return option;
+        }
+
         private void startScreenshotButton_Click(object sender, EventArgs e)
         {
             if (false == screenshotBackgroundWorker.IsBusy)
@@ -261,8 +286,7 @@ namespace AnimeFaceWinForm
                     var args = new ScreenshotBackgroundWorkArguments()
                     {
                         Fps = fps,
-                        WithoutFaceRecognition = screenshotWithoutFaceRecognitionCheckBox.Checked,
-                        SaveScreenshotImage = saveScreenshotCheckBox.Checked,
+                        OptionFlags = getScreenshotOptionFlags(),
                     };
 
                     screenshotBackgroundWorker.RunWorkerAsync(args);
@@ -280,8 +304,7 @@ namespace AnimeFaceWinForm
         class ScreenshotBackgroundWorkArguments
         {
             public float Fps { get; set; }
-            public bool WithoutFaceRecognition { get; set; }
-            public bool SaveScreenshotImage { get; set; }
+            public ScreenshotOptionFlag OptionFlags { get; set; }
         }
         
         class ScreenshotBackgroundWorkUserState
@@ -339,7 +362,7 @@ namespace AnimeFaceWinForm
             saveDir = System.IO.Path.GetFullPath(saveDir);
             saveScreenshotDir = System.IO.Path.GetFullPath(saveScreenshotDir);
 
-            if (args.SaveScreenshotImage)
+            if (args.OptionFlags.HasFlag(ScreenshotOptionFlag.SaveScreenshot))
             {
                 if (System.IO.Directory.Exists(saveScreenshotDir) == false)
                 {
@@ -377,14 +400,14 @@ namespace AnimeFaceWinForm
                 if (bmp != null)
                 {
                     // スクショを保存
-                    if (args.SaveScreenshotImage)
+                    if (args.OptionFlags.HasFlag(ScreenshotOptionFlag.SaveScreenshot))
                     {
                         string path = System.IO.Path.Combine(saveScreenshotDir, userState.ScreenshotCount + ".png");
                         bmp.Save(path);
                     }
 
                     // 顔認識して、顔部分を切り出して保存
-                    if (false == args.WithoutFaceRecognition)
+                    if (args.OptionFlags.HasFlag(ScreenshotOptionFlag.FaceRecognition))
                     {
                         string prefix = userState.ScreenshotCount + "-";
                         AnimeFaceRecognizer.FaceRecognizeAndSaveResults(bmp, saveDir, prefix);
@@ -439,6 +462,6 @@ namespace AnimeFaceWinForm
 
             setUIEnabled(false);
         }
-    
+
     }
 }
