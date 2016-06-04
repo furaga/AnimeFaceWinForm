@@ -20,6 +20,7 @@ namespace AnimeFaceWinForm
         private void Form1_Load(object sender, EventArgs e)
         {
             screenshotOptionComboBox.SelectedIndex = 0;
+            tabControl1.SelectedIndex = 1;
         }
 
         class bgWorkArg
@@ -285,6 +286,7 @@ namespace AnimeFaceWinForm
                 {
                     var args = new ScreenshotBackgroundWorkArguments()
                     {
+                        Prefix = prefixTBox.Text,
                         Fps = fps,
                         OptionFlags = getScreenshotOptionFlags(),
                     };
@@ -303,6 +305,7 @@ namespace AnimeFaceWinForm
 
         class ScreenshotBackgroundWorkArguments
         {
+            public string Prefix { get; set; }
             public float Fps { get; set; }
             public ScreenshotOptionFlag OptionFlags { get; set; }
         }
@@ -310,6 +313,7 @@ namespace AnimeFaceWinForm
         class ScreenshotBackgroundWorkUserState
         {
             public int ScreenshotCount { get; set; }
+            public long ScreenshotTime { get; set; }
             public float RealFps { get; set; }
             public string SaveDirectoryPath { get; set; }
         }
@@ -356,6 +360,7 @@ namespace AnimeFaceWinForm
             var userState = new ScreenshotBackgroundWorkUserState()
             {
                 ScreenshotCount = 0,
+                ScreenshotTime = 0,
                 RealFps = args.Fps,
                 SaveDirectoryPath = saveDir,
             };
@@ -382,10 +387,12 @@ namespace AnimeFaceWinForm
 
             List<float> elapsedTimeHistory = new List<float>();
 
-            System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
+            System.Diagnostics.Stopwatch fpsTimer = new System.Diagnostics.Stopwatch();
+
+            System.Diagnostics.Stopwatch elapsedTimer = System.Diagnostics.Stopwatch.StartNew();
             while (true)
             {
-                timer.Restart();
+                fpsTimer.Restart();
 
                 // キャンセルされてないか定期的にチェック
                 if (worker.CancellationPending)
@@ -395,25 +402,28 @@ namespace AnimeFaceWinForm
                 }
 
                 var bmp = takeScreenshot(Screen.PrimaryScreen.Bounds);
+
+                userState.ScreenshotTime = elapsedTimer.ElapsedMilliseconds;
+
                 if (bmp != null)
                 {
                     // スクショを保存
                     if (args.OptionFlags.HasFlag(ScreenshotOptionFlag.SaveScreenshot))
                     {
-                        string path = System.IO.Path.Combine(saveScreenshotDir, userState.ScreenshotCount + ".png");
+                        string path = System.IO.Path.Combine(saveScreenshotDir, args.Prefix + userState.ScreenshotTime + ".png");
                         bmp.Save(path);
                     }
 
                     // 顔認識して、顔部分を切り出して保存
                     if (args.OptionFlags.HasFlag(ScreenshotOptionFlag.FaceRecognition))
                     {
-                        string prefix = userState.ScreenshotCount + "-";
+                        string prefix = userState.ScreenshotTime + "-";
                         AnimeFaceRecognizer.FaceRecognizeAndSaveResults(bmp, saveDir, prefix);
                     }
                 }
 
                 // FPS設定に合わせて、一定時間寝る
-                int waitTime = (int)(millisecPerFrame - timer.ElapsedMilliseconds);
+                int waitTime = (int)(millisecPerFrame - fpsTimer.ElapsedMilliseconds);
                 waitTime = Math.Max(0, waitTime);
                 System.Threading.Thread.Sleep(waitTime);
 
@@ -421,7 +431,7 @@ namespace AnimeFaceWinForm
                 userState.ScreenshotCount++;
 
                 // fpsの計算
-                elapsedTimeHistory.Add(timer.ElapsedMilliseconds);
+                elapsedTimeHistory.Add(fpsTimer.ElapsedMilliseconds);
                 if (elapsedTimeHistory.Sum() >= 1.0f)
                 {
                     userState.RealFps = 1000.0f / elapsedTimeHistory.Average();

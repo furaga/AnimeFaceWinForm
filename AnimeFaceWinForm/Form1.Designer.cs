@@ -59,6 +59,8 @@
             this.fpsTextBox = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.screenshotBackgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.label3 = new System.Windows.Forms.Label();
+            this.prefixTBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.startFrame)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.skipFrames)).BeginInit();
             this.tabControl1.SuspendLayout();
@@ -334,6 +336,8 @@
             // panel1
             // 
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.prefixTBox);
+            this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.screenshotOptionComboBox);
             this.panel1.Controls.Add(this.label5);
@@ -341,17 +345,17 @@
             this.panel1.Controls.Add(this.label7);
             this.panel1.Location = new System.Drawing.Point(12, 17);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(774, 142);
+            this.panel1.Size = new System.Drawing.Size(774, 161);
             this.panel1.TabIndex = 28;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(15, 68);
+            this.label1.Location = new System.Drawing.Point(11, 67);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(120, 21);
+            this.label1.Size = new System.Drawing.Size(129, 21);
             this.label1.TabIndex = 30;
-            this.label1.Text = "How to work";
+            this.label1.Text = "Capture Type";
             // 
             // screenshotOptionComboBox
             // 
@@ -398,6 +402,22 @@
             this.screenshotBackgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.screenshotBackgroundWorker_DoWork);
             this.screenshotBackgroundWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.screenshotBackgroundWorker_ProgressChanged);
             this.screenshotBackgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.screenshotBackgroundWorker_RunWorkerCompleted);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(11, 111);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(195, 21);
+            this.label3.TabIndex = 31;
+            this.label3.Text = "Prefix of Saving Files";
+            // 
+            // prefixTBox
+            // 
+            this.prefixTBox.Location = new System.Drawing.Point(213, 111);
+            this.prefixTBox.Name = "prefixTBox";
+            this.prefixTBox.Size = new System.Drawing.Size(130, 28);
+            this.prefixTBox.TabIndex = 32;
             // 
             // Form1
             // 
@@ -461,6 +481,8 @@
         private System.ComponentModel.BackgroundWorker screenshotBackgroundWorker;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox screenshotOptionComboBox;
+        private System.Windows.Forms.TextBox prefixTBox;
+        private System.Windows.Forms.Label label3;
     }
 }
 

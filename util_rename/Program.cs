@@ -14,7 +14,13 @@ namespace util_rename
             {
                 if (f.EndsWith(".png"))
                 {
-                    System.IO.File.Move(f, f.Replace("（", "(").Replace("）", ")").Replace(" ", ""));
+                    string new_filename =  f.Replace("（", "(").Replace("）", ")").Replace(" ", "");
+                    while (System.IO.File.Exists(new_filename))
+                    {
+                        new_filename = new_filename.Replace(".png", "_.png");
+                    }
+
+                    System.IO.File.Move(f, new_filename);
                     Console.WriteLine(f + " -> " + f.Replace("（", "(").Replace("）", ")").Replace(" ", ""));
                 }
             }

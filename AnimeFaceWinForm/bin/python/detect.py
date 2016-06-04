@@ -16,7 +16,7 @@ def detect(filename, cascade_file = "lbpcascade_animeface.xml"):
                                      # detector options
                                      scaleFactor = 1.1,
                                      minNeighbors = 5,
-                                     minSize = (24, 24))
+                                     minSize = (256, 256))
     
     faceCount = 0;
     for (x, y, w, h) in faces:
